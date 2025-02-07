@@ -9,26 +9,74 @@ export class PlayerController {
   
     @Get('api/player')
     findAll(): Promise<Player[]> {
-      return this.PlayerService.findAll();
+      return new Promise<Player[]>((resolve, reject) => {
+        this.PlayerService.findAll((error, players) => {
+          if (error) {
+            reject(error);
+          } else if (players) {
+            resolve(players);
+          } else {
+            reject(new Error('No players found'));
+          }
+        });
+      });
     }
   
     @Get('api/player:id')
     findOne(@Param('id') id: string): Promise<Player> {
-      return this.PlayerService.findOne(id);
+      return new Promise<Player>((resolve, reject) => {
+        this.PlayerService.findOne(id, (error, player) => {
+          if (error) {
+            reject(error);
+          } else if (player) {
+            resolve(player);
+          } else {
+            reject(new Error('Player not found'));
+          }
+        });
+      });
     }
   
     @Post('api/player')
     create(@Body() Player: Player): Promise<Player> {
-      return this.PlayerService.create(Player);
+      return new Promise<Player>((resolve, reject) => {
+        this.PlayerService.create(Player, (error, result) => {
+          if (error) {
+            reject(error);
+          } else if (result) {
+            resolve(result);
+          } else {
+            reject(new Error('Player creation failed'));
+          }
+        });
+      });
     }
   
     @Delete('api/player:id')
     remove(@Param('id') id: string): Promise<void> {
-      return this.PlayerService.remove(id);
+      return new Promise<void>((resolve, reject) => {
+        this.PlayerService.remove(id, (error) => {
+          if (error) {
+            reject(error);
+          } else {
+            resolve();
+          }
+        });
+      });
     }
 
     @Get('api/ranking')
     getRanking(): Promise<Player[]> {
-      return this.PlayerService.findAll();
+      return new Promise<Player[]>((resolve, reject) => {
+        this.PlayerService.findAll((error, players) => {
+          if (error) {
+            reject(error);
+          } else if (players) {
+            resolve(players);
+          } else {
+            reject(new Error('No players found'));
+          }
+        });
+      });
     }
 }

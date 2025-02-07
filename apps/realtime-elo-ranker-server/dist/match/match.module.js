@@ -9,17 +9,21 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.MatchModule = void 0;
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
-const player_entity_1 = require("../entities/player.entity");
 const match_entity_1 = require("../entities/match.entity");
-const player_service_1 = require("../player/player.service");
+const player_entity_1 = require("../entities/player.entity");
 const match_service_1 = require("./match.service");
 const match_controller_1 = require("./match.controller");
+const player_service_1 = require("../player/player.service");
+const event_emitter_1 = require("@nestjs/event-emitter");
 let MatchModule = class MatchModule {
 };
 exports.MatchModule = MatchModule;
 exports.MatchModule = MatchModule = __decorate([
     (0, common_1.Module)({
-        imports: [typeorm_1.TypeOrmModule.forFeature([player_entity_1.Player, match_entity_1.Match])],
+        imports: [
+            typeorm_1.TypeOrmModule.forFeature([match_entity_1.Match, player_entity_1.Player]),
+            event_emitter_1.EventEmitterModule.forRoot(),
+        ],
         providers: [match_service_1.MatchService, player_service_1.PlayerService],
         controllers: [match_controller_1.MatchController],
     })

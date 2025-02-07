@@ -1,15 +1,20 @@
-import { Controller, Post, Body, Res } from '@nestjs/common';
+import { Controller, Post, Body, Res, Get } from '@nestjs/common';
 import { MatchService } from './match.service';
 import { Match } from '../entities/match.entity';
 import { Response } from 'express';
-import { EventEmitter2 } from '@nestjs/event-emitter';
 
-@Controller()
+@Controller('api/match')
 export class MatchController {
     constructor(private readonly matchService: MatchService) {}
 
-    @Post('api/match')
-    MAJElo(@Body() match: Match, @Res() res : Response): Promise<void> {
-        return this.matchService.MAJElo(match);
+    @Post()
+    MAJElo(@Body() match: Match, @Res() res: Response): void {
+        this.matchService.MAJElo(match, (error) => {
+            if (error) {
+                res.status(500).send(error.message);
+            } else {
+                res.status(200).send('Match updated');
+            }
+        });
     }
 }

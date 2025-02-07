@@ -21,20 +21,27 @@ let MatchController = class MatchController {
         this.matchService = matchService;
     }
     MAJElo(match, res) {
-        return this.matchService.MAJElo(match);
+        this.matchService.MAJElo(match, (error) => {
+            if (error) {
+                res.status(500).send(error.message);
+            }
+            else {
+                res.status(200).send('Match updated');
+            }
+        });
     }
 };
 exports.MatchController = MatchController;
 __decorate([
-    (0, common_1.Post)('api/match'),
+    (0, common_1.Post)(),
     __param(0, (0, common_1.Body)()),
     __param(1, (0, common_1.Res)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [match_entity_1.Match, Object]),
-    __metadata("design:returntype", Promise)
+    __metadata("design:returntype", void 0)
 ], MatchController.prototype, "MAJElo", null);
 exports.MatchController = MatchController = __decorate([
-    (0, common_1.Controller)(),
+    (0, common_1.Controller)('api/match'),
     __metadata("design:paramtypes", [match_service_1.MatchService])
 ], MatchController);
 //# sourceMappingURL=match.controller.js.map

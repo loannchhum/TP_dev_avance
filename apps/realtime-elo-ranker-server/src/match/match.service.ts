@@ -1,53 +1,77 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Match } from '../entities/match.entity';
 import { Player } from '../entities/player.entity';
 import { PlayerService } from '../player/player.service';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 
 @Injectable()
 export class MatchService {
     constructor(
-        @InjectRepository(Player)
-        private playerRepository: Repository<Player>,
         @InjectRepository(Match)
         private matchRepository: Repository<Match>,
+        @InjectRepository(Player)
+        private playerRepository: Repository<Player>,
         private readonly playerService: PlayerService,
+        private readonly eventEmitter: EventEmitter2,
     ) {}
 
-    async MAJElo(match: Match): Promise<void> {
+    MAJElo(match: Match, callback: (error: any) => void): void {
         const { winner, loser, draw } = match;
 
-        const winnerPlayer = await this.playerService.findOne(winner);
-        const loserPlayer = await this.playerService.findOne(loser);
+        this.playerService.findOne(winner, (error, winnerPlayer) => {
+            if (error || !winnerPlayer) {
+                callback(error || new Error('Winner player not found'));
+                return;
+            }
 
-        if (!winnerPlayer || !loserPlayer) {
-            throw new Error('Player not found');
-        }
+            this.playerService.findOne(loser, (error, loserPlayer) => {
+                if (error || !loserPlayer) {
+                    callback(error || new Error('Loser player not found'));
+                    return;
+                }
 
-        const K = 32; // Coefficient de pondération
+                const K = 32;
 
-        if (draw) {
-            // Handle draw case
-            const expectedScoreWinner = this.calculateExpectedScore(winnerPlayer.rank, loserPlayer.rank);
-            const expectedScoreLoser = this.calculateExpectedScore(loserPlayer.rank, winnerPlayer.rank);
+                if (draw) {
+                    const expectedScoreWinner = this.calculateScore(winnerPlayer.rank, loserPlayer.rank);
+                    const expectedScoreLoser = this.calculateScore(loserPlayer.rank, winnerPlayer.rank);
 
-            winnerPlayer.rank = Math.round(winnerPlayer.rank + K * (0.5 - expectedScoreWinner));
-            loserPlayer.rank = Math.round(loserPlayer.rank + K * (0.5 - expectedScoreLoser));
-        } else {
-            const expectedScoreWinner = this.calculateExpectedScore(winnerPlayer.rank, loserPlayer.rank);
-            const expectedScoreLoser = this.calculateExpectedScore(loserPlayer.rank, winnerPlayer.rank);
+                    winnerPlayer.rank = Math.round(winnerPlayer.rank + K * (0.5 - expectedScoreWinner));
+                    loserPlayer.rank = Math.round(loserPlayer.rank + K * (0.5 - expectedScoreLoser));
+                } else {
+                    const expectedScoreWinner = this.calculateScore(winnerPlayer.rank, loserPlayer.rank);
+                    const expectedScoreLoser = this.calculateScore(loserPlayer.rank, winnerPlayer.rank);
 
-            winnerPlayer.rank = Math.round(winnerPlayer.rank + K * (1 - expectedScoreWinner));
-            loserPlayer.rank = Math.round(loserPlayer.rank + K * (0 - expectedScoreLoser));
-        }
+                    winnerPlayer.rank = Math.round(winnerPlayer.rank + K * (1 - expectedScoreWinner));
+                    loserPlayer.rank = Math.round(loserPlayer.rank + K * (0 - expectedScoreLoser));
+                }
 
-        await this.playerRepository.save(winnerPlayer);
-        await this.playerRepository.save(loserPlayer);
-        await this.matchRepository.save(match);
+                this.playerRepository.save(winnerPlayer)
+                    .then(() => this.playerRepository.save(loserPlayer))
+                    .then(() => this.matchRepository.save(match))
+                    .then(() => {
+                        this.eventEmitter.emit('match.result', {
+                            player: {
+                                id: winnerPlayer.id,
+                                rank: winnerPlayer.rank,
+                            },
+                        });
+                        this.eventEmitter.emit('match.result', {
+                            player: {
+                                id: loserPlayer.id,
+                                rank: loserPlayer.rank,
+                            },
+                        });
+                        return this.matchRepository.save(match);
+                    })
+                    .then(() => callback(null))
+                    .catch(error => callback(error));
+            });
+        });
     }
-
-    private calculateExpectedScore(rankA: number, rankB: number): number {
+    private calculateScore(rankA: number, rankB: number): number {
         return 1 / (1 + Math.pow(10, (rankB - rankA) / 400));
     }
 }

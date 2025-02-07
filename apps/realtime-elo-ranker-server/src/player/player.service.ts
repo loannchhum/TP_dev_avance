@@ -36,10 +36,24 @@ export class PlayerService {
             callback(new Error('Player id is not valid'), null);
             return;
         }
-        player.rank = 1000;
+        this.PlayerRepository.find()
+            .then(players => {
+            const totalRank = players.reduce((sum, p) => sum + p.rank, 0);
+            const averageRank = Math.round(players.length > 0 ? totalRank / players.length : 1000);
+            player.rank = averageRank;
+            })
+            .catch(error => {
+            callback(error, null);
+            return;
+            });
         this.PlayerRepository.save(player)
             .then(savedPlayer => {
-                this.eventEmitter.emit('player.created', savedPlayer);
+                this.eventEmitter.emit('player.created', {
+                    player: {
+                        id : savedPlayer.id,
+                        rank: savedPlayer.rank,
+                    }
+                });
                 callback(null, savedPlayer);
             })
             .catch(error => callback(error, null));

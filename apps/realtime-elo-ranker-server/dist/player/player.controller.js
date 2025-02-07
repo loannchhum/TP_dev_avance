@@ -21,19 +21,76 @@ let PlayerController = class PlayerController {
         this.PlayerService = PlayerService;
     }
     findAll() {
-        return this.PlayerService.findAll();
+        return new Promise((resolve, reject) => {
+            this.PlayerService.findAll((error, players) => {
+                if (error) {
+                    reject(error);
+                }
+                else if (players) {
+                    resolve(players);
+                }
+                else {
+                    reject(new Error('No players found'));
+                }
+            });
+        });
     }
     findOne(id) {
-        return this.PlayerService.findOne(id);
+        return new Promise((resolve, reject) => {
+            this.PlayerService.findOne(id, (error, player) => {
+                if (error) {
+                    reject(error);
+                }
+                else if (player) {
+                    resolve(player);
+                }
+                else {
+                    reject(new Error('Player not found'));
+                }
+            });
+        });
     }
     create(Player) {
-        return this.PlayerService.create(Player);
+        return new Promise((resolve, reject) => {
+            this.PlayerService.create(Player, (error, result) => {
+                if (error) {
+                    reject(error);
+                }
+                else if (result) {
+                    resolve(result);
+                }
+                else {
+                    reject(new Error('Player creation failed'));
+                }
+            });
+        });
     }
     remove(id) {
-        return this.PlayerService.remove(id);
+        return new Promise((resolve, reject) => {
+            this.PlayerService.remove(id, (error) => {
+                if (error) {
+                    reject(error);
+                }
+                else {
+                    resolve();
+                }
+            });
+        });
     }
     getRanking() {
-        return this.PlayerService.findAll();
+        return new Promise((resolve, reject) => {
+            this.PlayerService.findAll((error, players) => {
+                if (error) {
+                    reject(error);
+                }
+                else if (players) {
+                    resolve(players);
+                }
+                else {
+                    reject(new Error('No players found'));
+                }
+            });
+        });
     }
 };
 exports.PlayerController = PlayerController;

@@ -1,13 +1,17 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Player } from '../entities/player.entity';
 import { Match } from '../entities/match.entity';
-import { PlayerService } from '../player/player.service';
+import { Player } from '../entities/player.entity';
 import { MatchService } from './match.service';
 import { MatchController } from './match.controller';
+import { PlayerService } from '../player/player.service';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([Player, Match])],
+    imports: [
+        TypeOrmModule.forFeature([Match, Player]),
+        EventEmitterModule.forRoot(),
+    ],
     providers: [MatchService, PlayerService],
     controllers: [MatchController],
 })

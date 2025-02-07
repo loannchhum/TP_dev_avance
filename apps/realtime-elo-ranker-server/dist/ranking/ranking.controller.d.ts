@@ -1,7 +1,11 @@
 import { RankingService } from './ranking.service';
-import { Player } from 'src/entities/player.entity';
+import { Response } from 'express';
+import { Observable } from 'rxjs';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 export declare class RankingController {
     private readonly rankingService;
-    constructor(rankingService: RankingService);
-    getRankings(): Promise<Player[]>;
+    private readonly eventEmitter;
+    constructor(rankingService: RankingService, eventEmitter: EventEmitter2);
+    getRankings(res: Response): void;
+    sse(): Observable<MessageEvent>;
 }
