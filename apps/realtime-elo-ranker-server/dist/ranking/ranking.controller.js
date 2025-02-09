@@ -47,7 +47,7 @@ let RankingController = class RankingController {
                 },
             };
         }));
-        const matchUpdate = (0, rxjs_1.fromEvent)(this.eventEmitter, 'match.result').pipe((0, rxjs_1.map)((event) => {
+        const matchResult = (0, rxjs_1.fromEvent)(this.eventEmitter, 'match.result').pipe((0, rxjs_1.map)((event) => {
             console.log('match.result recu', event);
             return {
                 data: {
@@ -56,7 +56,7 @@ let RankingController = class RankingController {
                 },
             };
         }));
-        return (0, rxjs_1.merge)(playerCreated, matchUpdate);
+        return (0, rxjs_1.merge)(playerCreated, matchResult);
     }
 };
 exports.RankingController = RankingController;

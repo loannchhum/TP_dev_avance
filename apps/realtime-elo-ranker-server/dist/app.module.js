@@ -12,6 +12,7 @@ const typeorm_1 = require("@nestjs/typeorm");
 const player_module_1 = require("./player/player.module");
 const match_module_1 = require("./match/match.module");
 const ranking_module_1 = require("./ranking/ranking.module");
+const event_emitter_1 = require("@nestjs/event-emitter");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -26,7 +27,8 @@ exports.AppModule = AppModule = __decorate([
             }),
             player_module_1.PlayerModule,
             match_module_1.MatchModule,
-            ranking_module_1.RankingModule
+            ranking_module_1.RankingModule,
+            event_emitter_1.EventEmitterModule.forRoot(),
         ],
     })
 ], AppModule);

@@ -32,15 +32,15 @@ export class PlayerService {
     }
 
     create(player: CreatePlayerDto, callback: (error: any, result: Player | null) => void): void {
-        if (player.id === '') {
+        if (!player.id || player.id.trim() === '') {
             callback(new Error('Player id is not valid'), null);
             return;
         }
         this.PlayerRepository.find()
             .then(players => {
-            const totalRank = players.reduce((sum, p) => sum + p.rank, 0);
-            const averageRank = Math.round(players.length > 0 ? totalRank / players.length : 1000);
-            player.rank = averageRank;
+                const totalRank = players.reduce((sum, p) => sum + p.rank, 0);
+                const averageRank = Math.round(players.length > 0 ? totalRank / players.length : 1000);
+                player.rank = averageRank;
             })
             .catch(error => {
             callback(error, null);

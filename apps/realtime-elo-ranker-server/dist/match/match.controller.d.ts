@@ -7,5 +7,5 @@ export declare class MatchController {
     constructor(matchService: MatchService);
     findAll(): Promise<Match[]>;
     findOne(id: number): Promise<Match | null>;
-    createMatch(matchdto: CreateMatchDto, res: Response): Promise<any>;
+    createMatch(match: CreateMatchDto, res: Response): void;
 }

@@ -82,12 +82,6 @@ let MatchService = class MatchService {
                         }
                     });
                     console.log('match.result emit pour le perdant:', loserPlayer);
-                    const updateMatchDto = {
-                        winner: winnerPlayer.id,
-                        loser: loserPlayer.id,
-                        draw: savedMatch.draw,
-                    };
-                    this.eventEmitter.emit('match.result', updateMatchDto);
                 })
                     .catch(error => callback(error));
             });

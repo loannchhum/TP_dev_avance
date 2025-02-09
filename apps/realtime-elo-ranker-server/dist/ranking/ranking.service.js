@@ -17,11 +17,9 @@ const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
 const player_entity_1 = require("../entities/player.entity");
-const event_emitter_1 = require("@nestjs/event-emitter");
 let RankingService = class RankingService {
-    constructor(playerRepository, eventEmitter) {
+    constructor(playerRepository) {
         this.playerRepository = playerRepository;
-        this.eventEmitter = eventEmitter;
     }
     getRankings(callback) {
         this.playerRepository.find({
@@ -35,7 +33,6 @@ exports.RankingService = RankingService;
 exports.RankingService = RankingService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, typeorm_1.InjectRepository)(player_entity_1.Player)),
-    __metadata("design:paramtypes", [typeorm_2.Repository,
-        event_emitter_1.EventEmitter2])
+    __metadata("design:paramtypes", [typeorm_2.Repository])
 ], RankingService);
 //# sourceMappingURL=ranking.service.js.map

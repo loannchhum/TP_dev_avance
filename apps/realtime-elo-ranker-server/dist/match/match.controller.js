@@ -26,23 +26,15 @@ let MatchController = class MatchController {
     findOne(id) {
         return this.matchService.findOne(+id);
     }
-    async createMatch(matchdto, res) {
-        try {
-            await new Promise((resolve, reject) => {
-                this.matchService.createMatch(matchdto, (error, result) => {
-                    if (error) {
-                        reject(error);
-                    }
-                    else {
-                        res.status(200).json(result);
-                        resolve();
-                    }
-                });
-            });
-        }
-        catch (error) {
-            throw new Error(error.message);
-        }
+    createMatch(match, res) {
+        this.matchService.createMatch(match, (error) => {
+            if (error) {
+                res.status(500).send(error.message);
+            }
+            else {
+                res.status(200).send('Match created');
+            }
+        });
     }
 };
 exports.MatchController = MatchController;
@@ -65,7 +57,7 @@ __decorate([
     __param(1, (0, common_1.Res)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [create_match_dto_1.CreateMatchDto, Object]),
-    __metadata("design:returntype", Promise)
+    __metadata("design:returntype", void 0)
 ], MatchController.prototype, "createMatch", null);
 exports.MatchController = MatchController = __decorate([
     (0, common_1.Controller)('api/match'),

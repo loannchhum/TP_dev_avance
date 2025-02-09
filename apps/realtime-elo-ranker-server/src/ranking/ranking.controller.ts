@@ -40,7 +40,7 @@ export class RankingController {
             })
         );
 
-        const matchUpdate = fromEvent(this.eventEmitter, 'match.result').pipe(
+        const matchResult = fromEvent(this.eventEmitter, 'match.result').pipe(
             map((event: { player: Player }) => {
                 console.log('match.result recu', event);
                 return <MessageEvent>{
@@ -51,6 +51,6 @@ export class RankingController {
                 };
             })
         );
-        return merge(playerCreated, matchUpdate);
+        return merge(playerCreated, matchResult);
     }
 }

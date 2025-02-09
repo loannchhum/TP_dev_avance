@@ -9,7 +9,6 @@ export class RankingService {
     constructor(
         @InjectRepository(Player)
         private readonly playerRepository: Repository<Player>,
-        private readonly eventEmitter: EventEmitter2,
     ) {}
 
     getRankings(callback: (error: any, result: { id: string, rank: number }[] | null) => void): void {

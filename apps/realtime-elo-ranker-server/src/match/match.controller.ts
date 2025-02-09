@@ -19,20 +19,13 @@ export class MatchController {
     }
 
     @Post()
-    async createMatch(@Body() matchdto: CreateMatchDto, @Res() res: Response): Promise<any> {
-        try {
-            await new Promise<void>((resolve, reject) => {
-                this.matchService.createMatch(matchdto, (error: any, result?: any) => {
-                    if (error) {
-                        reject(error);
-                    } else {
-                        res.status(200).json(result);
-                        resolve();
-                    }
-                });
-            });
-        } catch (error) {
-            throw new Error(error.message);
-        }
-    }
+    createMatch(@Body() match: CreateMatchDto, @Res() res: Response): void {
+        this.matchService.createMatch(match, (error) => {
+            if (error) {
+                res.status(500).send(error.message);
+            } else {
+                res.status(200).send('Match created');
+            }
+        });
+    }    
 }
