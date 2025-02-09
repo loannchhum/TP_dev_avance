@@ -29,7 +29,7 @@ let RankingController = class RankingController {
             }
             else {
                 if (players) {
-                    players.sort((a, b) => b.rank - a.rank);
+                    players.sort((a, b) => a.rank - b.rank);
                     res.status(200).json(players);
                 }
                 else {
@@ -48,6 +48,7 @@ let RankingController = class RankingController {
             };
         }));
         const matchUpdate = (0, rxjs_1.fromEvent)(this.eventEmitter, 'match.result').pipe((0, rxjs_1.map)((event) => {
+            console.log('match.result recu', event);
             return {
                 data: {
                     type: 'RankingUpdate',

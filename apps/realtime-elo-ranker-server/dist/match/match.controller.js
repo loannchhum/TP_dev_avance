@@ -15,31 +15,58 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.MatchController = void 0;
 const common_1 = require("@nestjs/common");
 const match_service_1 = require("./match.service");
-const match_entity_1 = require("../entities/match.entity");
+const create_match_dto_1 = require("./dto/create-match-dto");
 let MatchController = class MatchController {
     constructor(matchService) {
         this.matchService = matchService;
     }
-    MAJElo(match, res) {
-        this.matchService.MAJElo(match, (error) => {
-            if (error) {
-                res.status(500).send(error.message);
-            }
-            else {
-                res.status(200).send('Match updated');
-            }
-        });
+    findAll() {
+        return this.matchService.findAll();
+    }
+    findOne(id) {
+        return this.matchService.findOne(+id);
+    }
+    async createMatch(matchdto, res) {
+        try {
+            await new Promise((resolve, reject) => {
+                this.matchService.createMatch(matchdto, (error, result) => {
+                    if (error) {
+                        reject(error);
+                    }
+                    else {
+                        res.status(200).json(result);
+                        resolve();
+                    }
+                });
+            });
+        }
+        catch (error) {
+            throw new Error(error.message);
+        }
     }
 };
 exports.MatchController = MatchController;
+__decorate([
+    (0, common_1.Get)(),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], MatchController.prototype, "findAll", null);
+__decorate([
+    (0, common_1.Get)(':id'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", Promise)
+], MatchController.prototype, "findOne", null);
 __decorate([
     (0, common_1.Post)(),
     __param(0, (0, common_1.Body)()),
     __param(1, (0, common_1.Res)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [match_entity_1.Match, Object]),
-    __metadata("design:returntype", void 0)
-], MatchController.prototype, "MAJElo", null);
+    __metadata("design:paramtypes", [create_match_dto_1.CreateMatchDto, Object]),
+    __metadata("design:returntype", Promise)
+], MatchController.prototype, "createMatch", null);
 exports.MatchController = MatchController = __decorate([
     (0, common_1.Controller)('api/match'),
     __metadata("design:paramtypes", [match_service_1.MatchService])

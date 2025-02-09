@@ -1,8 +1,11 @@
 import { MatchService } from './match.service';
 import { Match } from '../entities/match.entity';
 import { Response } from 'express';
+import { CreateMatchDto } from './dto/create-match-dto';
 export declare class MatchController {
     private readonly matchService;
     constructor(matchService: MatchService);
-    MAJElo(match: Match, res: Response): void;
+    findAll(): Promise<Match[]>;
+    findOne(id: number): Promise<Match | null>;
+    createMatch(matchdto: CreateMatchDto, res: Response): Promise<any>;
 }

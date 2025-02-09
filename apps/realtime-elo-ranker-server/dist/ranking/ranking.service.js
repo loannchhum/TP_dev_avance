@@ -27,7 +27,7 @@ let RankingService = class RankingService {
         this.playerRepository.find({
             select: ['id', 'rank'],
         })
-            .then(players => callback(null, players))
+            .then(players => callback(null, players.sort((a, b) => a.rank - b.rank)))
             .catch(error => callback(error, null));
     }
 };

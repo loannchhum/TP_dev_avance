@@ -27,8 +27,14 @@ let MatchService = class MatchService {
         this.playerService = playerService;
         this.eventEmitter = eventEmitter;
     }
-    MAJElo(match, callback) {
-        const { winner, loser, draw } = match;
+    async findAll() {
+        return this.matchRepository.find();
+    }
+    async findOne(id) {
+        return this.matchRepository.findOneBy({ id });
+    }
+    createMatch(matchDto, callback) {
+        const { winner, loser, draw } = matchDto;
         this.playerService.findOne(winner, (error, winnerPlayer) => {
             if (error || !winnerPlayer) {
                 callback(error || new Error('Winner player not found'));
@@ -41,41 +47,53 @@ let MatchService = class MatchService {
                 }
                 const K = 32;
                 if (draw) {
-                    const expectedScoreWinner = this.calculateScore(winnerPlayer.rank, loserPlayer.rank);
-                    const expectedScoreLoser = this.calculateScore(loserPlayer.rank, winnerPlayer.rank);
-                    winnerPlayer.rank = Math.round(winnerPlayer.rank + K * (0.5 - expectedScoreWinner));
-                    loserPlayer.rank = Math.round(loserPlayer.rank + K * (0.5 - expectedScoreLoser));
+                    const scoreWinner = this.Score(winnerPlayer.rank, loserPlayer.rank);
+                    const scoreLoser = this.Score(loserPlayer.rank, winnerPlayer.rank);
+                    winnerPlayer.rank = Math.round(winnerPlayer.rank + K * (0.5 - scoreWinner));
+                    loserPlayer.rank = Math.round(loserPlayer.rank + K * (0.5 - scoreLoser));
                 }
                 else {
-                    const expectedScoreWinner = this.calculateScore(winnerPlayer.rank, loserPlayer.rank);
-                    const expectedScoreLoser = this.calculateScore(loserPlayer.rank, winnerPlayer.rank);
-                    winnerPlayer.rank = Math.round(winnerPlayer.rank + K * (1 - expectedScoreWinner));
-                    loserPlayer.rank = Math.round(loserPlayer.rank + K * (0 - expectedScoreLoser));
+                    const scoreWinner = this.Score(winnerPlayer.rank, loserPlayer.rank);
+                    const scoreLoser = this.Score(loserPlayer.rank, winnerPlayer.rank);
+                    winnerPlayer.rank = Math.round(winnerPlayer.rank + K * (1 - scoreWinner));
+                    loserPlayer.rank = Math.round(loserPlayer.rank + K * (0 - scoreLoser));
                 }
                 this.playerRepository.save(winnerPlayer)
                     .then(() => this.playerRepository.save(loserPlayer))
-                    .then(() => this.matchRepository.save(match))
                     .then(() => {
+                    const match = new match_entity_1.Match();
+                    match.winner = winnerPlayer.id;
+                    match.loser = loserPlayer.id;
+                    match.draw = draw;
+                    return this.matchRepository.save(match);
+                })
+                    .then((savedMatch) => {
                     this.eventEmitter.emit('match.result', {
                         player: {
                             id: winnerPlayer.id,
                             rank: winnerPlayer.rank,
-                        },
+                        }
                     });
+                    console.log('match.result emit pour le gagnant:', winnerPlayer);
                     this.eventEmitter.emit('match.result', {
                         player: {
                             id: loserPlayer.id,
                             rank: loserPlayer.rank,
-                        },
+                        }
                     });
-                    return this.matchRepository.save(match);
+                    console.log('match.result emit pour le perdant:', loserPlayer);
+                    const updateMatchDto = {
+                        winner: winnerPlayer.id,
+                        loser: loserPlayer.id,
+                        draw: savedMatch.draw,
+                    };
+                    this.eventEmitter.emit('match.result', updateMatchDto);
                 })
-                    .then(() => callback(null))
                     .catch(error => callback(error));
             });
         });
     }
-    calculateScore(rankA, rankB) {
+    Score(rankA, rankB) {
         return 1 / (1 + Math.pow(10, (rankB - rankA) / 400));
     }
 };
